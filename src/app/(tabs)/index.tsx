@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../../theme/ThemeContext';
 import { typography } from '../../theme/theme';
 import { messageService } from '../../services/MessageService';
@@ -61,6 +62,22 @@ export default function ChatsScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
+        ListHeaderComponent={
+          <TouchableOpacity
+            style={[styles.discoverBanner, { backgroundColor: theme.card, borderColor: theme.secondary }]}
+            onPress={() => router.push('/nearby')}
+            activeOpacity={0.8}
+          >
+            <View style={styles.discoverLeft}>
+              <MaterialCommunityIcons name="radar" size={20} color={theme.secondary} />
+              <Text style={[styles.discoverText, { color: theme.textPrimary }]}>NEARBY LAN DEVICES</Text>
+            </View>
+            <View style={styles.discoverRight}>
+              <Text style={[styles.discoverAction, { color: theme.secondary }]}>SCAN & DISCOVER</Text>
+              <MaterialCommunityIcons name="chevron-right" size={18} color={theme.secondary} />
+            </View>
+          </TouchableOpacity>
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: theme.textMuted }]}>
@@ -80,6 +97,35 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     gap: 12,
+  },
+  discoverBanner: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 14,
+    marginBottom: 8,
+  },
+  discoverLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  discoverText: {
+    fontFamily: typography.fontMono,
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  discoverRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  discoverAction: {
+    fontFamily: typography.fontMono,
+    fontSize: 11,
+    fontWeight: 'bold',
+    marginRight: 2,
   },
   card: {
     borderRadius: 12,

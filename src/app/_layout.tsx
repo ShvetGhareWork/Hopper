@@ -26,6 +26,13 @@ function RootLayoutNav() {
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="chat/[id]" options={{ title: 'Chat' }} />
+        <Stack.Screen
+          name="nearby"
+          options={{
+            title: 'NEARBY LAN DEVICES',
+            headerTitleStyle: { fontFamily: 'monospace', fontSize: 14, fontWeight: 'bold' },
+          }}
+        />
       </Stack>
     </>
   );

@@ -14,6 +14,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../../theme/ThemeContext';
 import { typography } from '../../theme/theme';
 import { messageService } from '../../services/MessageService';
+import { discoveryService } from '../../services/DiscoveryService';
 import { Message, Conversation } from '../../types/models';
 import { HopBadge } from '../../components/HopBadge';
 import { ConnectionStatusDot } from '../../components/ConnectionStatusDot';
@@ -26,6 +27,7 @@ export default function ChatDetailScreen() {
   const [conversation, setConversation] = useState<Conversation | undefined>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
+  const [isConnected, setIsConnected] = useState(true);
   const flatListRef = useRef<FlatList>(null);
 
   const loadData = async () => {
@@ -34,12 +36,24 @@ export default function ChatDetailScreen() {
     setConversation(conv);
     const msgs = await messageService.getMessagesForConversation(id);
     setMessages(msgs);
+
+    if (conv?.isChannel) {
+      setIsConnected(true);
+    } else {
+      const activePeers = discoveryService.getDiscoveredPeers();
+      const peerFound = activePeers.some((p) => p.peerId === id);
+      setIsConnected(peerFound);
+    }
   };
 
   useEffect(() => {
     loadData();
-    const unsubscribe = messageService.subscribe(loadData);
-    return () => unsubscribe();
+    const unsubMsg = messageService.subscribe(loadData);
+    const unsubDisc = discoveryService.subscribe(() => loadData());
+    return () => {
+      unsubMsg();
+      unsubDisc();
+    };
   }, [id]);
 
   const handleSend = async () => {
@@ -67,11 +81,7 @@ export default function ChatDetailScreen() {
 
           <View style={styles.messageMeta}>
             <Text style={[styles.timestamp, { color: theme.textMuted }]}>{item.timestamp}</Text>
-            {item.relayStatus === 'pending' ? (
-              <Text style={[styles.pendingText, { color: theme.primary }]}>RECOVERY HOPPING...</Text>
-            ) : (
-              <HopBadge hopCount={item.hopCount} />
-            )}
+            <HopBadge hopCount={item.hopCount} />
           </View>
         </View>
       </View>
@@ -99,14 +109,12 @@ export default function ChatDetailScreen() {
               >
                 {conversation?.title || 'Chat'}
               </Text>
-              {conversation?.peerStatus && (
-                <View style={styles.headerSubtitleRow}>
-                  <ConnectionStatusDot status={conversation.peerStatus} size={8} />
-                  <Text style={[styles.headerSubtitle, { color: theme.textMuted }]}>
-                    {conversation.peerStatus.toUpperCase()}
-                  </Text>
-                </View>
-              )}
+              <View style={styles.headerSubtitleRow}>
+                <ConnectionStatusDot status={isConnected ? 'online' : 'offline'} size={8} />
+                <Text style={[styles.headerSubtitle, { color: isConnected ? theme.secondary : theme.textMuted }]}>
+                  {conversation?.isChannel ? 'LAN BROADCAST' : isConnected ? 'DIRECT LAN CONNECTED' : 'OFFLINE (QUEUED)'}
+                </Text>
+              </View>
             </View>
           ),
           headerStyle: {
@@ -136,7 +144,7 @@ export default function ChatDetailScreen() {
               color: theme.textPrimary,
             },
           ]}
-          placeholder={isSosChannel ? 'Broadcast SOS alert...' : 'Type mesh message...'}
+          placeholder={isSosChannel ? 'Broadcast SOS alert...' : 'Type LAN message...'}
           placeholderTextColor={theme.textMuted}
           value={inputText}
           onChangeText={setInputText}
@@ -179,6 +187,7 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontFamily: typography.fontMono,
     fontSize: 10,
+    fontWeight: 'bold',
   },
   messageList: {
     padding: 16,
@@ -227,11 +236,6 @@ const styles = StyleSheet.create({
   timestamp: {
     fontFamily: typography.fontMono,
     fontSize: 10,
-  },
-  pendingText: {
-    fontFamily: typography.fontMono,
-    fontSize: 9,
-    fontWeight: 'bold',
   },
   inputContainer: {
     flexDirection: 'row',

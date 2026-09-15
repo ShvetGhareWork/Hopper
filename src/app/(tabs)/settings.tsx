@@ -14,17 +14,27 @@ import { useTheme } from '../../theme/ThemeContext';
 import { typography } from '../../theme/theme';
 import { StorageService } from '../../services/StorageService';
 import { messageService } from '../../services/MessageService';
+import { discoveryService, DiscoveredPeer } from '../../services/DiscoveryService';
+import { IdentityService } from '../../services/IdentityService';
+import { NETWORK_CONFIG } from '../../config/network';
 import { PanicButton } from '../../components/PanicButton';
 
 export default function SettingsScreen() {
   const { mode, theme, toggleTheme } = useTheme();
   const [displayName, setDisplayName] = useState('');
+  const [peerId, setPeerId] = useState('');
+  const [discoveredPeers, setDiscoveredPeers] = useState<DiscoveredPeer[]>([]);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
     StorageService.getDisplayName().then((name) => {
       if (name) setDisplayName(name);
     });
+    IdentityService.getOrCreatePeerId().then(setPeerId);
+
+    setDiscoveredPeers(discoveryService.getDiscoveredPeers());
+    const unsubscribe = discoveryService.subscribe(setDiscoveredPeers);
+    return () => unsubscribe();
   }, []);
 
   const handleSaveName = async () => {
@@ -33,6 +43,7 @@ export default function SettingsScreen() {
       return;
     }
     await StorageService.setDisplayName(displayName.trim());
+    await discoveryService.start(); // Refresh Zeroconf broadcast name
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2000);
   };
@@ -101,28 +112,37 @@ export default function SettingsScreen() {
           {savedSuccess && (
             <Text style={[styles.savedText, { color: theme.secondary }]}>Callsign updated!</Text>
           )}
+
+          <Text style={[styles.label, { color: theme.textMuted, marginTop: 12 }]}>NODE ID (UUID)</Text>
+          <Text style={[styles.peerIdText, { color: theme.textPrimary }]}>{peerId || 'Generating...'}</Text>
         </View>
 
         {/* NETWORK DIAGNOSTICS */}
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: theme.primary }]}>NETWORK STATUS (MOCK)</Text>
+          <Text style={[styles.sectionTitle, { color: theme.primary }]}>NETWORK DIAGNOSTICS (REAL)</Text>
         </View>
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.cardBorder }]}>
           <View style={styles.diagRow}>
-            <Text style={[styles.diagLabel, { color: theme.textMuted }]}>Mesh Protocol:</Text>
-            <Text style={[styles.diagValue, { color: theme.secondary }]}>BLE + Wi-Fi Direct</Text>
+            <Text style={[styles.diagLabel, { color: theme.textMuted }]}>mDNS Peer Discovery:</Text>
+            <Text style={[styles.diagValue, { color: theme.secondary }]}>
+              {discoveryService.getIsScanning() ? 'SCANNING (_hopper._tcp.)' : 'STANDBY'}
+            </Text>
           </View>
           <View style={styles.diagRow}>
-            <Text style={[styles.diagLabel, { color: theme.textMuted }]}>Local Radio Status:</Text>
-            <Text style={[styles.diagValue, { color: theme.secondary }]}>ACTIVE (14 Nodes)</Text>
+            <Text style={[styles.diagLabel, { color: theme.textMuted }]}>Discovered LAN Peers:</Text>
+            <Text style={[styles.diagValue, { color: theme.secondary }]}>
+              {discoveredPeers.length} ACTIVE PEERS
+            </Text>
           </View>
           <View style={styles.diagRow}>
-            <Text style={[styles.diagLabel, { color: theme.textMuted }]}>Packet Relay Routing:</Text>
-            <Text style={[styles.diagValue, { color: theme.secondary }]}>Store-and-Forward</Text>
+            <Text style={[styles.diagLabel, { color: theme.textMuted }]}>TCP Server Port:</Text>
+            <Text style={[styles.diagValue, { color: theme.secondary }]}>
+              LISTENING ({NETWORK_CONFIG.DEFAULT_PORT})
+            </Text>
           </View>
           <View style={styles.diagRow}>
-            <Text style={[styles.diagLabel, { color: theme.textMuted }]}>Cellular/Internet:</Text>
-            <Text style={[styles.diagValue, { color: theme.danger }]}>DISCONNECTED (Mesh Only)</Text>
+            <Text style={[styles.diagLabel, { color: theme.textMuted }]}>Internet Connection:</Text>
+            <Text style={[styles.diagValue, { color: theme.danger }]}>OFFLINE (Direct LAN Only)</Text>
           </View>
         </View>
 
@@ -134,8 +154,8 @@ export default function SettingsScreen() {
 
         {/* ABOUT INFO */}
         <View style={styles.aboutContainer}>
-          <Text style={[styles.aboutTitle, { color: theme.textPrimary }]}>HOPPER MESH MESHING ENGINE</Text>
-          <Text style={[styles.aboutSub, { color: theme.textMuted }]}>v1.0.0-sprint1 • Zero-Internet Mesh Protocol</Text>
+          <Text style={[styles.aboutTitle, { color: theme.textPrimary }]}>HOPPER MESHING ENGINE</Text>
+          <Text style={[styles.aboutSub, { color: theme.textMuted }]}>v2.0.0-sprint2 • Zeroconf mDNS + TCP Transport</Text>
         </View>
       </View>
     </ScrollView>
@@ -217,6 +237,11 @@ const styles = StyleSheet.create({
     fontFamily: typography.fontMono,
     fontSize: 11,
     marginTop: 6,
+  },
+  peerIdText: {
+    fontFamily: typography.fontMono,
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   diagRow: {
     flexDirection: 'row',

@@ -1,18 +1,31 @@
 {
   "expo": {
-    "name": "app",
-    "slug": "app",
+    "name": "Hopper",
+    "slug": "hopper-mesh",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "app",
+    "scheme": "hopper",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.hopper.mesh",
+      "infoPlist": {
+        "NSLocalNetworkUsageDescription": "Hopper requires local network access for peer-to-peer mesh discovery and socket messaging without internet.",
+        "NSBonjourServices": ["_hopper._tcp."]
+      }
     },
     "android": {
+      "package": "com.hopper.mesh",
+      "permissions": [
+        "CHANGE_WIFI_MULTICAST_STATE",
+        "ACCESS_WIFI_STATE",
+        "INTERNET",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#0B0F10",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -25,10 +38,11 @@
     },
     "plugins": [
       "expo-router",
+      "expo-dev-client",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#0B0F10",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
