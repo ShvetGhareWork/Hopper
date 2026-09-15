@@ -1,0 +1,28 @@
+npm warn exec The following package was not found and will be installed: serve@14.2.6
+ INFO  Accepting connections at http://localhost:3000
+ HTTP  9/15/2026 1:24:40 PM ::1 HEAD /
+ HTTP  9/15/2026 1:24:40 PM ::1 Returned 200 in 29 ms
+ HTTP  9/15/2026 1:25:57 PM ::1 GET /
+ HTTP  9/15/2026 1:25:57 PM ::1 Returned 200 in 15 ms
+ HTTP  9/15/2026 1:25:57 PM ::1 GET /_expo/static/js/web/entry-c13e06d4bb2a2ee298dab09594582a08.js
+ HTTP  9/15/2026 1:25:57 PM ::1 Returned 200 in 10 ms
+ HTTP  9/15/2026 1:25:58 PM ::1 GET /assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.6e435534bd35da5fef04168860a9b8fa.ttf
+ HTTP  9/15/2026 1:25:58 PM ::1 Returned 200 in 17 ms
+ HTTP  9/15/2026 1:27:03 PM ::1 GET /
+ HTTP  9/15/2026 1:27:03 PM ::1 Returned 200 in 2 ms
+ HTTP  9/15/2026 1:27:03 PM ::1 GET /_expo/static/js/web/entry-c13e06d4bb2a2ee298dab09594582a08.js
+ HTTP  9/15/2026 1:27:03 PM ::1 Returned 200 in 1 ms
+ HTTP  9/15/2026 1:27:03 PM ::1 GET /assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.6e435534bd35da5fef04168860a9b8fa.ttf
+ HTTP  9/15/2026 1:27:03 PM ::1 Returned 200 in 2 ms
+ HTTP  9/15/2026 1:27:07 PM ::1 GET /assets/node_modules/expo-router/assets/react-navigation/elements/back-icon.35ba0eaec5a4f5ed12ca16fabeae451d.png
+ HTTP  9/15/2026 1:27:07 PM ::1 Returned 200 in 4 ms
+ HTTP  9/15/2026 1:28:15 PM ::1 GET /
+ HTTP  9/15/2026 1:28:15 PM ::1 Returned 200 in 2 ms
+ HTTP  9/15/2026 1:28:15 PM ::1 GET /_expo/static/js/web/entry-c13e06d4bb2a2ee298dab09594582a08.js
+ HTTP  9/15/2026 1:28:15 PM ::1 Returned 200 in 1 ms
+ HTTP  9/15/2026 1:28:15 PM ::1 GET /assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.6e435534bd35da5fef04168860a9b8fa.ttf
+ HTTP  9/15/2026 1:28:15 PM ::1 Returned 200 in 2 ms
+ HTTP  9/15/2026 1:28:19 PM ::1 GET /assets/node_modules/expo-router/assets/react-navigation/elements/back-icon.35ba0eaec5a4f5ed12ca16fabeae451d.png
+ HTTP  9/15/2026 1:28:19 PM ::1 Returned 200 in 2 ms
+
+ INFO  Gracefully shutting down. Please wait...
